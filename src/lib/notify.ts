@@ -28,13 +28,11 @@ export function notifyYesViaGoogleForm(noAttempts: number) {
   });
 }
 
-/** Builds the wa.me link for the "tell him yourself" button, or null if not configured. */
-export function whatsappLink(noAttempts: number) {
+/** Builds the wa.me link for the "tell me yourself" button, or null if not configured. */
+export function whatsappLink() {
   const digits = config.whatsapp.number.replace(/\D/g, "");
   if (!digits) return null;
 
-  const suffix =
-    noAttempts > 0 ? ` ...and I only tried clicking No ${noAttempts} times 😂` : "";
-  const text = encodeURIComponent(`${config.whatsapp.message}${suffix}`);
+  const text = encodeURIComponent(config.whatsapp.message);
   return `https://wa.me/${digits}?text=${text}`;
 }

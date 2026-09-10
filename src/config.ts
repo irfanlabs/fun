@@ -16,6 +16,6 @@ export const config = {
     // Example: "923001234567" for +92 300 1234567
     number: "923079888720",
     // The message that will be pre-typed for her (she can edit it before sending).
-    message: "I said YES 💖",
+    message: "I said YES 💖🥰💍✨",
   },
 };

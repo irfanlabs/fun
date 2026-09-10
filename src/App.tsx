@@ -301,7 +301,7 @@ function App() {
   }
 
   const yesScale = Math.min(1 + attempts * 0.045, 1.7);
-  const waLink = whatsappLink(attempts);
+  const waLink = whatsappLink();
 
   return (
     <div className="relative min-h-svh w-full overflow-hidden bg-gradient-to-br from-rose-200 via-pink-300 to-red-300">
