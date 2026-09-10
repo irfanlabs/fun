@@ -26,7 +26,48 @@ const NO_REACTIONS = [
 
 const BURST_EMOJIS = ["😂", "🤣", "😅", "😆", "💨", "😏", "🙅‍♀️", "😭", "👀", "💫"];
 
-type Burst = { id: number; top: number; left: number; emoji: string };
+const NO_BUTTON_LABELS = [
+  "No",
+  "Nope 😅",
+  "Nuh-uh",
+  "Never!",
+  "Nah 😌",
+  "Not today",
+  "Denied 🚫",
+  "In your dreams 😂",
+  "🙅‍♀️",
+  "😏",
+  "Absolutely not",
+  "Try harder 😆",
+  "👻 boo",
+  "🏃💨",
+  "lol no",
+  "Still no 🤭",
+];
+
+const BIG_EMOJIS = ["🤣", "😂", "😹", "💀", "🙈", "😆", "🤪", "😝", "🫣", "😜"];
+
+const MILESTONES: Record<number, { text: string; emoji: string }> = {
+  3: { text: "Three tries in? Someone's determined 😏", emoji: "😏" },
+  5: { text: "Okay this is getting impressive 😂", emoji: "😂" },
+  8: { text: "Persistence level: unhinged 🤪", emoji: "🤪" },
+  10: { text: "Ten strikes and still swinging 💀", emoji: "💀" },
+  15: { text: "At this point it's basically cardio 🏃‍♀️💨", emoji: "🏃‍♀️" },
+  20: { text: "The 'No' button called — it wants a raise 😆", emoji: "🥵" },
+  25: { text: "Guinness World Records has been notified 🏆😂", emoji: "🏆" },
+  30: { text: "Just click Yes already, we're both tired 😹", emoji: "😹" },
+  40: { text: "Are you okay?? Blink twice if you need help 😭", emoji: "😭" },
+  50: { text: "50. FIFTY. I'm honestly impressed. Still no. 🫡", emoji: "🫡" },
+};
+
+const FLOURISHES = [
+  "animate-flourish-spin",
+  "animate-flourish-wiggle",
+  "animate-flourish-pop",
+  "animate-flourish-jelly",
+];
+
+type Burst = { id: number; top: number; left: number; emoji: string; dx: number; dy: number };
 type FloatingHeart = {
   id: number;
   left: number;
@@ -91,11 +132,16 @@ function App() {
     "Go ahead, pick one... 👀 (we both know which one 😏)",
   );
   const [noPos, setNoPos] = useState({ top: 120, left: 120 });
+  const [noLabel, setNoLabel] = useState("No");
+  const [flourish, setFlourish] = useState("");
   const [bursts, setBursts] = useState<Burst[]>([]);
+  const [emojiPop, setEmojiPop] = useState<{ id: number; emoji: string } | null>(null);
   const yesBtnRef = useRef<HTMLButtonElement>(null);
   const noBtnRef = useRef<HTMLButtonElement>(null);
   const lastReactionIndex = useRef(-1);
+  const lastLabelIndex = useRef(0);
   const burstIdRef = useRef(0);
+  const popIdRef = useRef(0);
 
   const [floatingHearts] = useState<FloatingHeart[]>(() =>
     Array.from({ length: 18 }).map((_, i) => ({
@@ -127,20 +173,24 @@ function App() {
   useEffect(() => {
     if (bursts.length === 0) return;
     const timer = setTimeout(() => {
-      setBursts((prev) => prev.slice(1));
+      setBursts((prev) => prev.slice(3));
     }, 900);
     return () => clearTimeout(timer);
   }, [bursts]);
 
-  function pickReaction() {
-    let idx = Math.floor(Math.random() * NO_REACTIONS.length);
-    if (NO_REACTIONS.length > 1) {
-      while (idx === lastReactionIndex.current) {
-        idx = Math.floor(Math.random() * NO_REACTIONS.length);
-      }
+  useEffect(() => {
+    if (!emojiPop) return;
+    const timer = setTimeout(() => setEmojiPop(null), 900);
+    return () => clearTimeout(timer);
+  }, [emojiPop]);
+
+  function pickFrom<T>(pool: T[], lastRef: React.RefObject<number>) {
+    let idx = Math.floor(Math.random() * pool.length);
+    while (pool.length > 1 && idx === lastRef.current) {
+      idx = Math.floor(Math.random() * pool.length);
     }
-    lastReactionIndex.current = idx;
-    return NO_REACTIONS[idx];
+    lastRef.current = idx;
+    return pool[idx];
   }
 
   function pickSpot(cursor?: { x: number; y: number }) {
@@ -185,20 +235,33 @@ function App() {
   function dodge(clientX?: number, clientY?: number) {
     const cursor = clientX !== undefined && clientY !== undefined ? { x: clientX, y: clientY } : undefined;
     const next = pickSpot(cursor);
+    const nextAttempt = attempts + 1;
+    const milestone = MILESTONES[nextAttempt];
 
+    const noSize = measureSize(noBtnRef.current, NO_BTN_FALLBACK);
+    const originX = noPos.left + noSize.width / 2;
+    const originY = noPos.top + noSize.height / 2;
     setBursts((prev) => [
       ...prev,
-      {
+      ...Array.from({ length: 3 }).map(() => ({
         id: burstIdRef.current++,
-        top: noPos.top,
-        left: noPos.left,
+        top: originY,
+        left: originX,
         emoji: BURST_EMOJIS[Math.floor(Math.random() * BURST_EMOJIS.length)],
-      },
+        dx: randBetween(-70, 70),
+        dy: randBetween(-110, -50),
+      })),
     ]);
 
     setNoPos(next);
-    setAttempts((a) => a + 1);
-    setReaction(pickReaction());
+    setAttempts(nextAttempt);
+    setReaction(milestone ? milestone.text : pickFrom(NO_REACTIONS, lastReactionIndex));
+    setNoLabel(pickFrom(NO_BUTTON_LABELS, lastLabelIndex));
+    setFlourish(FLOURISHES[Math.floor(Math.random() * FLOURISHES.length)]);
+    setEmojiPop({
+      id: popIdRef.current++,
+      emoji: milestone ? milestone.emoji : BIG_EMOJIS[Math.floor(Math.random() * BIG_EMOJIS.length)],
+    });
   }
 
   useLayoutEffect(() => {
@@ -283,12 +346,30 @@ function App() {
           {bursts.map((b) => (
             <span
               key={b.id}
-              className="animate-burst-float pointer-events-none fixed z-50 text-2xl"
-              style={{ top: `${b.top}px`, left: `${b.left}px` }}
+              className="animate-burst-scatter pointer-events-none fixed z-50 text-2xl"
+              style={
+                {
+                  top: `${b.top}px`,
+                  left: `${b.left}px`,
+                  "--dx": `${b.dx}px`,
+                  "--dy": `${b.dy}px`,
+                } as React.CSSProperties
+              }
             >
               {b.emoji}
             </span>
           ))}
+
+          {emojiPop && (
+            <div
+              key={emojiPop.id}
+              className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center"
+            >
+              <span className="animate-emoji-pop select-none text-[110px] leading-none drop-shadow-xl sm:text-[150px]">
+                {emojiPop.emoji}
+              </span>
+            </div>
+          )}
 
           <button
             ref={noBtnRef}
@@ -296,10 +377,12 @@ function App() {
             onPointerEnter={handleNoPointerEnter}
             onTouchStart={handleNoTouchStart}
             onClick={handleNoClick}
-            className="fixed z-50 h-11 rounded-full border border-transparent bg-rose-100 px-7 text-base font-semibold text-rose-900 shadow-lg transition-[top,left] duration-300 ease-out hover:bg-rose-100"
+            className="fixed z-50 h-11 rounded-full border border-transparent bg-rose-100 px-7 text-base font-semibold whitespace-nowrap text-rose-900 shadow-lg transition-[top,left] duration-300 ease-out hover:bg-rose-100"
             style={{ top: `${noPos.top}px`, left: `${noPos.left}px` }}
           >
-            No
+            <span key={attempts} className={cn("inline-block", flourish)}>
+              {noLabel}
+            </span>
           </button>
         </>
       )}
