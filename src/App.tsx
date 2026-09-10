@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Heart, PartyPopper, Sparkles } from "lucide-react";
+import { Heart, MessageCircle, PartyPopper, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { notifyYesViaGoogleForm, whatsappLink } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 
 const NAME = "My Lady";
@@ -158,6 +159,7 @@ function App() {
   const [confetti, setConfetti] = useState<Confetto[]>([]);
 
   function celebrate() {
+    notifyYesViaGoogleForm(attempts);
     setConfetti(
       Array.from({ length: 90 }).map((_, i) => ({
         id: i,
@@ -299,6 +301,7 @@ function App() {
   }
 
   const yesScale = Math.min(1 + attempts * 0.045, 1.7);
+  const waLink = whatsappLink(attempts);
 
   return (
     <div className="relative min-h-svh w-full overflow-hidden bg-gradient-to-br from-rose-200 via-pink-300 to-red-300">
@@ -479,6 +482,22 @@ function App() {
                 that confused look on your face. 😄❤️
               </p>
             </div>
+
+            {waLink && (
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <p className="text-sm text-rose-900/70">Now come tell me yourself 👇</p>
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 rounded-full bg-emerald-500 px-8 text-base font-semibold text-white shadow-lg hover:bg-emerald-600"
+                >
+                  <a href={waLink} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="size-5" />
+                    Send me a WhatsApp 💌
+                  </a>
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
