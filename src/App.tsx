@@ -64,8 +64,8 @@ function FinalLetter() {
         <p>
           I love how you laugh at your own jokes before you even finish telling them. I love how
           safe and calm I feel just existing next to you. And even though <strong>we're not doing the
-          relationship thing right now</strong>, I'm still grateful that out of everyone in the world, I got
-          to meet you.
+          relationship thing right now, I'm still grateful that out of everyone in the world, I got
+          to meet you.</strong>
         </p>
         <p>
           So I'm letting you go the way you asked — not because I stopped caring, but because you
