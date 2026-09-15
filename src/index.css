@@ -344,6 +344,21 @@
   animation: flourish-jelly 0.5s ease-in-out;
 }
 
+@keyframes step-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.96) translateY(8px);
+    opacity: 0;
+  }
+}
+
+.animate-step-out {
+  animation: step-out 0.28s ease-in forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-float-up,
   .animate-confetti-fall,

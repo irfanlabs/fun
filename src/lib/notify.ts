@@ -7,16 +7,20 @@ function parseGoogleForm(link: string) {
   return { formId: idMatch[1], entryId: entryMatch[1] };
 }
 
-/** Silently submits to your Google Form so you know she clicked Yes. */
-export function notifyYesViaGoogleForm(noAttempts: number) {
+function formatTimestamp() {
+  return new Date().toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+/** Silently submits to your Google Form so you know what she did. */
+export function trackEvent(message: string) {
   const parsed = parseGoogleForm(config.googleFormPrefilledLink);
   if (!parsed) return;
 
   const body = new URLSearchParams();
-  body.set(
-    parsed.entryId,
-    `She said YES 💖 on ${new Date().toLocaleString()} after ${noAttempts} failed "No" attempts 😂`,
-  );
+  body.set(parsed.entryId, `[${formatTimestamp()}] ${message}`);
 
   fetch(`https://docs.google.com/forms/d/e/${parsed.formId}/formResponse`, {
     method: "POST",
@@ -24,11 +28,27 @@ export function notifyYesViaGoogleForm(noAttempts: number) {
     keepalive: true,
     body,
   }).catch(() => {
-    // Best effort only; never interrupt the celebration.
+    // Best effort only; never interrupt her experience.
   });
 }
 
-/** Builds the wa.me link for the "tell me yourself" button, or null if not configured. */
+export function trackPageOpen() {
+  trackEvent("👀 OPENED the page");
+}
+
+export function trackStepComplete(stepIndex: number, stepTitle: string, totalSteps: number) {
+  trackEvent(`✅ STEP ${stepIndex + 1}/${totalSteps}: "${stepTitle}" completed`);
+}
+
+export function trackReachedEnd() {
+  trackEvent("💌 REACHED the final letter (she read the whole thing!)");
+}
+
+export function trackAbandoned(stepIndex: number, stepTitle: string) {
+  trackEvent(`🚪 LEFT at step ${stepIndex + 1}: "${stepTitle}"`);
+}
+
+/** Builds the wa.me link for the optional message button, or null if not configured. */
 export function whatsappLink() {
   const digits = config.whatsapp.number.replace(/\D/g, "");
   if (!digits) return null;
