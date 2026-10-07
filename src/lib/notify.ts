@@ -36,16 +36,28 @@ export function trackPageOpen() {
   trackEvent("👀 OPENED the page");
 }
 
-export function trackStepComplete(stepIndex: number, stepTitle: string, totalSteps: number) {
-  trackEvent(`✅ STEP ${stepIndex + 1}/${totalSteps}: "${stepTitle}" completed`);
+export function trackSaidYes(dodges: number) {
+  trackEvent(
+    dodges > 0
+      ? `💘 Clicked YES — after chasing the No button ${dodges} time${dodges === 1 ? "" : "s"} 😂`
+      : "💘 Clicked YES on the first try (zero hesitation!)",
+  );
 }
 
 export function trackReachedEnd() {
-  trackEvent("💌 REACHED the final letter (she read the whole thing!)");
+  trackEvent("💌 REACHED the final letter");
 }
 
-export function trackAbandoned(stepIndex: number, stepTitle: string) {
-  trackEvent(`🚪 LEFT at step ${stepIndex + 1}: "${stepTitle}"`);
+export function trackLetterFinished() {
+  trackEvent("📖 Watched the whole letter type out (she read everything!)");
+}
+
+export function trackWhatsAppClicked() {
+  trackEvent("💬 Tapped the WhatsApp button!!");
+}
+
+export function trackAbandoned(where: string) {
+  trackEvent(`🚪 LEFT while on: ${where}`);
 }
 
 /** Builds the wa.me link for the optional message button, or null if not configured. */
