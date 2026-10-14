@@ -111,11 +111,15 @@ function QuestionScreen({ onYes }: { onYes: (dodges: number) => void }) {
         {QUESTION.intro}
       </p>
 
-      <h1 className="animate-pop-in mt-4 max-w-3xl text-balance text-3xl font-extrabold leading-tight text-rose-950 sm:text-5xl">
-        {QUESTION.line}
+      <h1 className="animate-pop-in mt-5 max-w-3xl text-balance text-xl font-bold leading-snug text-rose-950 sm:text-2xl">
+        {QUESTION.note}
       </h1>
 
-      <p className="animate-pop-in mt-4 text-sm font-medium text-rose-900/60 sm:text-base">
+      <p className="animate-pop-in mt-6 max-w-xl text-balance text-base font-semibold leading-relaxed text-rose-900/80 sm:text-lg">
+        {QUESTION.line}
+      </p>
+
+      <p className="animate-pop-in mt-3 text-sm font-medium text-rose-900/60 sm:text-base">
         {QUESTION.hint}
       </p>
 

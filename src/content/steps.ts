@@ -5,6 +5,7 @@ export const QUESTION = {
   intro: "Hi Alieha. One tiny question… 👀",
   line: "Do you still think about me sometimes?",
   hint: "Be honest. The buttons already know. 😌",
+  note: "I still love you, and I'm still waiting for you to say the same. I know things between us didn't go well, and your company didn't allow relationships. But at least we can stay in touch on WhatsApp, or you can call me sometime and we can go for dinner. And for your peace of mind, I've left Workpod, so nothing is standing in the way anymore if you ever want this. I'm still waiting for you. ❤️",
   yesLabel: "Yes 😳",
   /** Shown in order, one per escape. The last one repeats if she keeps chasing it. */
   noLabels: [
